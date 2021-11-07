@@ -19,16 +19,15 @@ class Stone {
                 PVector.mult(basisVectors[1], 1 * m_halfHeight)),
             transform.position);
         
-        if (highestPoint.y <= 0)
+        if (highestPoint.y <= 0 )
         {
             // stone is submerged...
             rigidBody.AddDragCylinder(settings.liquidDensity, m_radius);
             rigidBody.Update(dt);
             return;
         }
-        
-        // rigidBody.AddDragCylinder(settings.airDensity, m_radius);
-        rigidBody.Update(dt);
+    
+        rigidBody.AddDragCylinder(0.00122, m_radius);
 
         PVector lowestPoint = PVector.add(
             PVector.add(
@@ -37,13 +36,15 @@ class Stone {
             transform.position);
 
         if (lowestPoint.y <= 0) {
-            if (!changedVelocity){
+            if (!changedVelocity) {
                 OnWaterCollision(lowestPoint);
                 skipCount++;
             }
         } else {
             changedVelocity = false;
         }
+
+        rigidBody.Update(dt);
     }
 
     public void OnSettingsUpdate(Settings settings) {
@@ -57,8 +58,7 @@ class Stone {
         stroke(255, 0, 0);
         fill(220);
         
-        PVector screenPosition = new PVector(transform.position.x * PIXELS_METER_RATIO,
-                            WINDOW_HEIGHT - (transform.position.y * PIXELS_METER_RATIO + WINDOW_HEIGHT * 0.3));
+        PVector screenPosition = getScreenPosition();
         
         pushMatrix();
         translate(screenPosition.x, screenPosition.y);
@@ -68,26 +68,26 @@ class Stone {
         popMatrix();
     }
 
+    public PVector getScreenPosition() {
+        return new PVector(transform.position.x * PIXELS_METER_RATIO,
+                 WINDOW_HEIGHT - (transform.position.y * PIXELS_METER_RATIO + WINDOW_HEIGHT * 0.3));
+    }
+
     public void OnWaterCollision(PVector lowestPoint) 
     {
         float beta = atan(abs(rigidBody.velocity.y / rigidBody.velocity.x));
         float vxout = rigidBody.velocity.mag() * cos(beta + transform.rotation) * cos(transform.rotation);
         float vyout = rigidBody.velocity.mag() * cos(beta + transform.rotation) * sin(transform.rotation); 
-        if (sq(vyout)-2*9.81*m_radius >= 0) {
-            float vyoutCorrected = sqrt(sq(vyout)-2*9.81*m_radius);
-            rigidBody.velocity = new PVector(vxout, vyoutCorrected);
-
+        
+        if (((sq(vyout) - 2 * 9.81 * (m_radius * sin(transform.rotation) + (settings.minimumSkipHeight/100))) < 0) ||
+            vxout < 0) {
+            changedVelocity = true;
+            return;
         }
-        else
-        {
-            rigidBody.velocity = new PVector(vxout, vyout);
 
-        }
+        vyout = sqrt(sq(vyout) - 2 * 9.81 * m_radius * sin(transform.rotation));
+        rigidBody.velocity = new PVector(vxout, vyout);
+        
         changedVelocity = true;
-    }
-
-    public void MoveInWater(){
-
-
     }
 }

@@ -1,23 +1,21 @@
-import controlP5.*;
-
 class Settings {
-    public float stoneThickness;
+    public float stoneThickness = 0.01;
     public Slider stoneThicknessSlider; 
-    public float stoneRadius;
+    public float stoneRadius = 0.04;
     public Slider stoneRadiusSlider; 
-    public float stoneDensity;
+    public float stoneDensity = 2.5;
     public Slider stoneDensitySlider; 
-    public float liquidDensity;
+    public float liquidDensity = 1.0;
     public Slider liquidDensitySlider; 
-    public float stoneAngle; // degrees
+    public float stoneAngle = 17; // degrees
     public Slider stoneAngleSlider;
-    public float launchHeight;
+    public float launchHeight = 0.5;
     public Slider launchHeightSlider;
-    public float initVelocityX;
+    public float initVelocityX = 10.0;
     public Slider initVelocityXSlider; 
-    public float initVelocityY;
+    public float initVelocityY = 0.0;
     public Slider initVelocityYSlider; 
-    public float minimumSkipHeight;
+    public float minimumSkipHeight = 0.5;
     public Slider minimumSkipHeightSlider;
 
     public boolean hasUpdated = true;
@@ -81,9 +79,9 @@ class Settings {
         initVelocityXSlider = cp5.addSlider("initial velocity x [m/s]: ")
         .setPosition(WINDOW_WIDTH - 175, 175)
         .setSize(150, 20)
-        .setRange(0.0, 10.0)
+        .setRange(0.0, 20.0)
         .setColorCaptionLabel(0)
-        .setValue(1.0);
+        .setValue(10.0);
         initVelocityXSlider.getCaptionLabel().setSize(16).align(ControlP5.LEFT_OUTSIDE, ControlP5.CENTER);
 
         initVelocityYSlider = cp5.addSlider("initial velocity y [m/s]: ")
@@ -94,14 +92,15 @@ class Settings {
         .setValue(0.0);
         initVelocityYSlider.getCaptionLabel().setSize(16).align(ControlP5.LEFT_OUTSIDE, ControlP5.CENTER);
 
-        minimumSkipHeightSlider = cp5.addSlider("minimum skip height [m]: ")
+        minimumSkipHeightSlider = cp5.addSlider("minimum skip height [cm]: ")
         .setPosition(WINDOW_WIDTH - 175, 225)
         .setSize(150, 20)
-        .setRange(0.0, 0.01)
+        .setRange(0.0, 2.0)
         .setColorCaptionLabel(0)
-        .setValue(0.005);
+        .setValue(0.5);
         minimumSkipHeightSlider.getCaptionLabel().setSize(16).align(ControlP5.LEFT_OUTSIDE, ControlP5.CENTER);
     }
+
 
     public void OnUI() {
         if (stoneThickness != stoneThicknessSlider.getValue()) {

@@ -18,8 +18,9 @@ class RigidBody {
     }
 
     public void AddDragCylinder(float fluidDensity, float radius) {
-        float dragMagnitude = 0.5 * 1.15 * fluidDensity * PI * sq(radius);
-        //AddForce();
+        float dragForce = 0.5 * 1.15 * (fluidDensity / 1000 * 1000000) * PI * sq(radius) * sq(velocity.mag());
+        PVector dragForceDirection = PVector.mult(PVector.div(velocity, velocity.mag()), -1);
+        AddForce(PVector.mult(dragForceDirection, dragForce));
     }
 
     public void AddForce(PVector force) {

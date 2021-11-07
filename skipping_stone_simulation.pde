@@ -1,37 +1,42 @@
-// http://www.sojamo.de/libraries/controlP5/#examples
+import controlP5.*;
 
+// UI Elements
 ControlP5 cp5;
 Button playButton;
 Button pauseButton;
 Button resetButton;
 Slider simulationSpeedSlider;
-
+ 
 Settings   settings   = new Settings();
 Simulation simulation = new Simulation(settings);
 
 int previousFrameTime = 0;
 
+// These should be constant, but whatever...
 int WINDOW_WIDTH  = 1200;
 int WINDOW_HEIGHT = 800;
 
+int TOP_BUTTON_SIZE   = 32;
+
 void setup() {
-    // Setup window, etc.
+    // ---- SETUP WINDOW ----
     size(1200, 800);
 
-    // ---- SETUP UI & SETTINGS ----
+    // ---- SETUP UI, FONT & SETTINGS ----
     cp5 = new ControlP5(this);
     settings.Setup(cp5);
 
-    textSize(20);
+    // use same font as cp5
+	PFont bitTextFont = new BitFont(CP.decodeBase64(BitFont.standard58base64));
+    textFont(bitTextFont);
 
     setupButtons();
 
+    // ---- RESET CLOCK ----
     previousFrameTime = millis();
 }
 
 void setupButtons() {
-    int BUTTON_SIZE = 32;
-
     // play button
     PImage[] playButtonImages = {
         loadImage("assets/play_button_default.png"),
@@ -39,7 +44,7 @@ void setupButtons() {
         loadImage("assets/play_button_active.png") };
     
     playButton = cp5.addButton("play")
-    .setPosition((WINDOW_WIDTH / 2) - (1.5 * BUTTON_SIZE), 0)
+    .setPosition((WINDOW_WIDTH / 2) - (1.5 * TOP_BUTTON_SIZE), 0)
     .setImages(playButtonImages)
     .updateSize()
     .setLabelVisible(false);
@@ -51,7 +56,7 @@ void setupButtons() {
         loadImage("assets/pause_button_active.png") };
     
     pauseButton = cp5.addButton("pause")
-    .setPosition((WINDOW_WIDTH / 2) - (0.5 * BUTTON_SIZE), 0)
+    .setPosition((WINDOW_WIDTH / 2) - (0.5 * TOP_BUTTON_SIZE), 0)
     .setImages(pauseButtonImages)
     .updateSize()
     .setLabelVisible(false);
@@ -63,14 +68,14 @@ void setupButtons() {
         loadImage("assets/reset_button_active.png") };
     
     resetButton = cp5.addButton("reset")
-    .setPosition((WINDOW_WIDTH / 2) + (0.5 * BUTTON_SIZE), 0)
+    .setPosition((WINDOW_WIDTH / 2) + (0.5 * TOP_BUTTON_SIZE), 0)
     .setImages(resetButtonImages)
     .updateSize()
     .setLabelVisible(false);
 
     // simulation speed slider
     simulationSpeedSlider = cp5.addSlider("simulation speed")
-     .setPosition((WINDOW_WIDTH / 2) - 2 * 32, BUTTON_SIZE + 16)
+     .setPosition((WINDOW_WIDTH / 2) - 2 * 32, TOP_BUTTON_SIZE + 16)
      .setSize(4*32, 20)
      .setRange(0.10, 1.5) // values can range from big to small as well
      .setValue(1)
@@ -113,5 +118,11 @@ void draw() {
     // clear/set the background to a sky color
     background(117, 250, 255);
 
-    simulation.Render();
+    // draw a sun
+    fill(255, 255, 0);
+    noStroke();
+    circle(100, 150, 75);
+
+    
+    simulation.Render(deltaTime);
 }

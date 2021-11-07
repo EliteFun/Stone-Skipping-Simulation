@@ -1,4 +1,33 @@
-int skipCount;
+int skipCount = 0;
+
+float scale  = 1.0;
+float logScale = 0.0;
+float minLogScale = -5.0;
+float maxLogScale =  5.0;
+float scaleVelocity = 0.01f;
+boolean canPan = true;
+PVector pan = new PVector(0, 0);
+
+
+void mouseDragged() {
+    pan.add(PVector.sub(new PVector(mouseX, mouseY), new PVector(pmouseX, pmouseY)));
+    // make sure we can't pan when changing the slider values
+
+ // if ((mouseX >= (WINDOW_WIDTH / 2) - 2 * 32 && mouseX <= (WINDOW_WIDTH / 2) + 2 * 32)
+ //     && (mouseY >= 32 + 16 && mouseY <= 32 + 20 + 36)) {
+ //     return;
+ // }
+    
+}
+
+void mouseWheel(MouseEvent event) {
+    logScale = constrain(logScale + event.getCount() * -1 * scaleVelocity, minLogScale, maxLogScale);
+    float prevScale = scale;
+    scale = (float) Math.pow(2, logScale);
+
+    PVector mousePos = new PVector(mouseX, mouseY);
+    pan = PVector.add(mousePos, PVector.mult(PVector.sub(pan, mousePos), scale / prevScale));
+}
 
 class Simulation {
 
@@ -21,6 +50,7 @@ class Simulation {
         isPaused       = true;
         skipCount      = 0;
 
+        pan = new PVector(0, 0);
     }
 
     public void OnSettingsUpdate() {
@@ -41,18 +71,41 @@ class Simulation {
             }
         }
     }
+    
+    public void Render(float dt) {
+        // TODO: adapt these with scale
+        if (stone.getScreenPosition().x + pan.x >= WINDOW_WIDTH * 0.8) {
+            pan.x -= ((stone.getScreenPosition().x + pan.x) - WINDOW_WIDTH * 0.8);
+        }
 
-    public void Render() {
+        if (-pan.x >= WINDOW_WIDTH * 14) {
+            pan.x = -WINDOW_WIDTH * 14;
+        } else if (-pan.x <= -WINDOW_WIDTH * 5) {
+            pan.x = WINDOW_WIDTH * 5;
+        }
+        if (-pan.y >= WINDOW_HEIGHT * 1.5) {
+            pan.y = -WINDOW_HEIGHT * 1.5;
+        } else if (-pan.y <= -WINDOW_HEIGHT * 2) {
+            pan.y = WINDOW_HEIGHT * 2;
+        }
+
+        pushMatrix();
+
+        translate(pan.x, pan.y);
+        scale(scale);
+
         stroke(255);
         fill(73, 7, 229);
         rectMode(CORNER);
-        rect(-1, (WINDOW_HEIGHT * 0.7), WINDOW_WIDTH + 1, WINDOW_HEIGHT * 0.3);
+        rect(-5*WINDOW_WIDTH, (WINDOW_HEIGHT * 0.7), WINDOW_WIDTH * 20, WINDOW_HEIGHT * 3);
 
         stone.Draw();
+        popMatrix();
 
         fill(0);
-        text("Skips: " + skipCount, 25, 25);
-        text("Simulation time: " + simulationTime, 25, 50);
+        textSize(20);
+        text("SKIP COUNT: " + skipCount, 25, 25);
+        text("SIMULATION TIME: " + String.format("%.2f", simulationTime), 25, 50);
     }
 
     private float simulationTime = 0.0f;
